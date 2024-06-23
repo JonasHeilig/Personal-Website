@@ -1,6 +1,8 @@
 import os
 from flask import Flask, render_template, request, redirect, session, url_for
 from flask_sqlalchemy import SQLAlchemy
+from flask import send_from_directory
+from flask import send_file
 from werkzeug.security import check_password_hash, generate_password_hash
 
 app = Flask(__name__)
@@ -15,8 +17,9 @@ class ProjectList(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     project_name = db.Column(db.String(50), nullable=False)
     project_description = db.Column(db.String(500), nullable=False)
-    project_image = db.Column(db.String(100), nullable=True)
+    project_image = db.Column(db.String(100), nullable=False)
     project_download = db.Column(db.String(100), nullable=True)
+    github_link = db.Column(db.String(100), nullable=True)
 
 
 class User(db.Model):
@@ -65,9 +68,14 @@ def projects():
     return render_template('projects.html', projects=project_list)
 
 
-@app.route('/project/<int:id>')
-def project(id):
-    project_element = ProjectList.query.get(id)
+@app.route('/project')
+def redirect_to_projects():
+    return redirect(url_for('projects'))
+
+
+@app.route('/project/<int:project_id>')
+def project(project_id):
+    project_element = ProjectList.query.get(project_id)
     if project_element is None:
         return render_template('project_not_found.html')
     return render_template('project.html', project=project_element)
@@ -75,7 +83,16 @@ def project(id):
 
 @app.route('/download/<int:project_id>')
 def download(project_id):
-    pass
+    project_selected = ProjectList.query.get(project_id)
+    if project_selected is None:
+        return "Project not found", 404
+    directory = 'static/downloads'
+    filename = project_selected.project_download
+    file_path = os.path.join(directory, filename)
+    try:
+        return send_file(file_path, as_attachment=True)
+    except FileNotFoundError:
+        return "File not found", 404
 
 
 @app.route('/admin')
@@ -90,12 +107,22 @@ def write_article():
 
 @app.route('/add_project', methods=['GET', 'POST'])
 def add_project():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    username = session['username']
+    user_in_session = User.query.filter_by(username=username).first()
+    if not user_in_session.isauthor:
+        return redirect(url_for('projects'))
     if request.method == 'POST':
+        github_link = request.form['github_link']
+        if not github_link.startswith('https://'):
+            github_link = 'https://' + github_link
         new_project = ProjectList(
             project_name=request.form['project_name'],
             project_description=request.form['project_description'],
             project_image=request.form['project_image'],
-            project_download=request.form['project_download']
+            project_download=request.form['project_download'],
+            github_link=github_link
         )
         db.session.add(new_project)
         db.session.commit()
