@@ -36,20 +36,22 @@ class Posts(db.Model):
     post_author = db.Column(db.String(50), nullable=False)
 
 
+def create_default_user():
+    admin_user = User(username='admin', password=generate_password_hash('password'), isadmin=True, isauthor=True)
+    db.session.add(admin_user)
+    db.session.commit()
+
+
 if not os.path.exists('instance/db.db'):
     with app.app_context():
         db.create_all()
+        create_default_user()
         print("Datenbank erstellt.")
 
 
 @app.route('/')
 def index():
     return render_template('index.html')
-
-
-@app.route('/aboutme')
-def aboutme():
-    pass
 
 
 @app.route('/blog')
@@ -103,7 +105,50 @@ def add_project():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    pass
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        user_in_session = User.query.filter_by(username=username).first()
+        if user_in_session and check_password_hash(user_in_session.password, password):
+            session['username'] = user_in_session.username
+            return redirect(url_for('index'))
+        else:
+            return render_template('login.html', error="Invalid username or password")
+    return render_template('login.html')
+
+
+@app.route('/user', methods=['GET', 'POST'])
+def user():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    username = session['username']
+    user_in_session = User.query.filter_by(username=username).first()
+    if request.method == 'POST':
+        new_password = request.form['new_password']
+        user_in_session.password = generate_password_hash(new_password)
+        db.session.commit()
+        return render_template('user.html', user=user_in_session, message="Password changed successfully")
+    return render_template('user.html', user=user_in_session)
+
+
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    return redirect(url_for('index'))
+
+
+@app.route('/change_password', methods=['GET', 'POST'])
+def change_password():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    username = session['username']
+    user_in_session = User.query.filter_by(username=username).first()
+    if request.method == 'POST':
+        new_password = request.form['new_password']
+        user_in_session.password = generate_password_hash(new_password)
+        db.session.commit()
+        return redirect(url_for('user'))
+    return render_template('change_password.html', user=user_in_session)
 
 
 if __name__ == '__main__':
