@@ -57,32 +57,9 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/blog')
-def blog():
+@app.route('/admin')
+def admin():
     pass
-
-
-@app.route('/projects')
-def projects():
-    project_list = ProjectList.query.all()
-    return render_template('projects.html', projects=project_list)
-
-
-@app.route('/project')
-def redirect_to_projects():
-    return redirect(url_for('projects'))
-
-
-@app.route('/project/<int:project_id>')
-def project(project_id):
-    project_element = ProjectList.query.get(project_id)
-    if project_element is None:
-        return render_template('project_not_found.html')
-    user_in_session = None
-    if 'username' in session:
-        username = session['username']
-        user_in_session = User.query.filter_by(username=username).first()
-    return render_template('project.html', project=project_element, user_in_session=user_in_session)
 
 
 @app.route('/download/<int:project_id>')
@@ -99,14 +76,106 @@ def download(project_id):
         return "File not found", 404
 
 
-@app.route('/admin')
-def admin():
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if 'username' in session:
+        return redirect(url_for('user'))
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        user_in_session = User.query.filter_by(username=username).first()
+        if user_in_session and check_password_hash(user_in_session.password, password):
+            session['username'] = user_in_session.username
+            return redirect(url_for('index'))
+        else:
+            return render_template('user_system/login.html', error="Invalid username or password")
+    return render_template('user_system/login.html')
+
+
+@app.route('/user', methods=['GET', 'POST'])
+def user():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    username = session['username']
+    user_in_session = User.query.filter_by(username=username).first()
+    if request.method == 'POST':
+        new_password = request.form['new_password']
+        user_in_session.password = generate_password_hash(new_password)
+        db.session.commit()
+        return render_template('user_system/user.html', user=user_in_session, message="Password changed successfully")
+    return render_template('user_system/user.html', user=user_in_session)
+
+
+@app.route('/change_username', methods=['GET', 'POST'])
+def change_username():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    username = session['username']
+    user_in_session = User.query.filter_by(username=username).first()
+    if request.method == 'POST':
+        new_username = request.form['new_username']
+        existing_user = User.query.filter_by(username=new_username).first()
+        if existing_user:
+            return render_template('user_system/change_username.html', user=user_in_session,
+                                   error="Username already exists")
+        user_in_session.username = new_username
+        session['username'] = new_username
+        db.session.commit()
+        return redirect(url_for('user'))
+    return render_template('user_system/change_username.html', user=user_in_session)
+
+
+@app.route('/change_password', methods=['GET', 'POST'])
+def change_password():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    username = session['username']
+    user_in_session = User.query.filter_by(username=username).first()
+    if request.method == 'POST':
+        new_password = request.form['new_password']
+        user_in_session.password = generate_password_hash(new_password)
+        db.session.commit()
+        return redirect(url_for('user'))
+    return render_template('user_system/change_password.html', user=user_in_session)
+
+
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    return redirect(url_for('index'))
+
+
+@app.route('/blog')
+def blog():
     pass
 
 
 @app.route('/write_blog')
 def write_article():
     pass
+
+
+@app.route('/projects')
+def projects():
+    project_list = ProjectList.query.all()
+    return render_template('project_system/projects.html', projects=project_list)
+
+
+@app.route('/project')
+def redirect_to_projects():
+    return redirect(url_for('projects'))
+
+
+@app.route('/project/<int:project_id>')
+def project(project_id):
+    project_element = ProjectList.query.get(project_id)
+    if project_element is None:
+        return render_template('project_system/project_not_found.html')
+    user_in_session = None
+    if 'username' in session:
+        username = session['username']
+        user_in_session = User.query.filter_by(username=username).first()
+    return render_template('project_system/project.html', project=project_element, user_in_session=user_in_session)
 
 
 @app.route('/add_project', methods=['GET', 'POST'])
@@ -131,7 +200,7 @@ def add_project():
         db.session.add(new_project)
         db.session.commit()
         return redirect(url_for('projects'))
-    return render_template('add_project.html')
+    return render_template('project_system/add_project.html')
 
 
 @app.route('/edit_project/<int:project_id>', methods=['GET', 'POST'])
@@ -144,7 +213,7 @@ def edit_project(project_id):
         return redirect(url_for('projects'))
     selected_project = ProjectList.query.get(project_id)
     if selected_project is None:
-        return render_template('project_not_found.html')
+        return render_template('project_system/project_not_found.html')
     if request.method == 'POST':
         github_link = request.form['github_link']
         if not github_link.startswith('https://'):
@@ -156,62 +225,12 @@ def edit_project(project_id):
         selected_project.github_link = github_link
         db.session.commit()
         return redirect(url_for('projects'))
-    return render_template('edit_project.html', project=selected_project)
+    return render_template('project_system/edit_project.html', project=selected_project)
 
 
 @app.route('/edit_project', methods=['GET', 'POST'])
 def redirect_from_edit_project():
     return redirect(url_for('projects'))
-
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if 'username' in session:
-        return redirect(url_for('user'))
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        user_in_session = User.query.filter_by(username=username).first()
-        if user_in_session and check_password_hash(user_in_session.password, password):
-            session['username'] = user_in_session.username
-            return redirect(url_for('index'))
-        else:
-            return render_template('login.html', error="Invalid username or password")
-    return render_template('login.html')
-
-
-@app.route('/user', methods=['GET', 'POST'])
-def user():
-    if 'username' not in session:
-        return redirect(url_for('login'))
-    username = session['username']
-    user_in_session = User.query.filter_by(username=username).first()
-    if request.method == 'POST':
-        new_password = request.form['new_password']
-        user_in_session.password = generate_password_hash(new_password)
-        db.session.commit()
-        return render_template('user.html', user=user_in_session, message="Password changed successfully")
-    return render_template('user.html', user=user_in_session)
-
-
-@app.route('/logout')
-def logout():
-    session.pop('username', None)
-    return redirect(url_for('index'))
-
-
-@app.route('/change_password', methods=['GET', 'POST'])
-def change_password():
-    if 'username' not in session:
-        return redirect(url_for('login'))
-    username = session['username']
-    user_in_session = User.query.filter_by(username=username).first()
-    if request.method == 'POST':
-        new_password = request.form['new_password']
-        user_in_session.password = generate_password_hash(new_password)
-        db.session.commit()
-        return redirect(url_for('user'))
-    return render_template('change_password.html', user=user_in_session)
 
 
 if __name__ == '__main__':

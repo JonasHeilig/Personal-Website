@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Change Username</title>
+    <link rel="stylesheet" href="/bootstrap-5.3.3-dist/css/bootstrap.min.css">
+    <script src="/bootstrap-5.3.3-dist/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Change Username</h1>
+        <form action="/change_username" method="post">
+            <div class="mb-3">
+                <label for="newUsername" class="form-label">New Username</label>
+                <input type="text" class="form-control" id="newUsername" name="new_username" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Change Username</button>
+        </form>
+        {% if error %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

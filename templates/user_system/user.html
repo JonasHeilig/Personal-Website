@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>User</title>
+    <link rel="stylesheet" href="/bootstrap-5.3.3-dist/css/bootstrap.min.css">
+    <script src="/bootstrap-5.3.3-dist/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>User: {{ user.username }}</h1> <br>
+        <p>Permissions: Admin - {{ user.isadmin }}</p>
+        <p>Author - {{ user.isauthor }}</p> <br><br><br>
+        <a href="/change_username" class="btn btn-primary">Change Username</a> <br><br>
+        <a href="/change_password" class="btn btn-primary">Change Password</a>
+        <a href="/logout" class="btn btn-danger">Logout</a>
+    </div>
+</body>
+</html>
