@@ -78,7 +78,11 @@ def project(project_id):
     project_element = ProjectList.query.get(project_id)
     if project_element is None:
         return render_template('project_not_found.html')
-    return render_template('project.html', project=project_element)
+    user_in_session = None
+    if 'username' in session:
+        username = session['username']
+        user_in_session = User.query.filter_by(username=username).first()
+    return render_template('project.html', project=project_element, user_in_session=user_in_session)
 
 
 @app.route('/download/<int:project_id>')
@@ -130,8 +134,40 @@ def add_project():
     return render_template('add_project.html')
 
 
+@app.route('/edit_project/<int:project_id>', methods=['GET', 'POST'])
+def edit_project(project_id):
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    username = session['username']
+    user_in_session = User.query.filter_by(username=username).first()
+    if not user_in_session.isauthor:
+        return redirect(url_for('projects'))
+    selected_project = ProjectList.query.get(project_id)
+    if selected_project is None:
+        return render_template('project_not_found.html')
+    if request.method == 'POST':
+        github_link = request.form['github_link']
+        if not github_link.startswith('https://'):
+            github_link = 'https://' + github_link
+        selected_project.project_name = request.form['project_name']
+        selected_project.project_description = request.form['project_description']
+        selected_project.project_image = request.form['project_image']
+        selected_project.project_download = request.form['project_download']
+        selected_project.github_link = github_link
+        db.session.commit()
+        return redirect(url_for('projects'))
+    return render_template('edit_project.html', project=selected_project)
+
+
+@app.route('/edit_project', methods=['GET', 'POST'])
+def redirect_from_edit_project():
+    return redirect(url_for('projects'))
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if 'username' in session:
+        return redirect(url_for('user'))
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']

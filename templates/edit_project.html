@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Projekt bearbeiten</title>
+    <link rel="stylesheet" href="/static/bootstrap-5.3.3-dist/css/bootstrap.min.css">
+    <script src="/static/bootstrap-5.3.3-dist/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Projekt bearbeiten</h1>
+        <form action="/edit_project/{{ project.id }}" method="post">
+            <div class="mb-3">
+                <label for="projectName" class="form-label">Projektname</label>
+                <input type="text" class="form-control" id="projectName" name="project_name" value="{{ project.project_name }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="projectDescription" class="form-label">Projektbeschreibung</label>
+                <textarea class="form-control" id="projectDescription" name="project_description" required>{{ project.project_description }}</textarea>
+            </div>
+            <div class="mb-3">
+                <label for="projectImage" class="form-label">Projektbild URL</label>
+                <input type="text" class="form-control" id="projectImage" name="project_image" value="{{ project.project_image }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="projectDownload" class="form-label">Projektdownload URL</label>
+                <input type="text" class="form-control" id="projectDownload" name="project_download" value="{{ project.project_download }}">
+            </div>
+            <div class="mb-3">
+                <label for="githubLink" class="form-label">GitHub Link</label>
+                <input type="text" class="form-control" id="githubLink" name="github_link" value="{{ project.github_link }}">
+            </div>
+            <button type="submit" class="btn btn-primary">Änderungen speichern</button>
+        </form>
+    </div>
+</body>
+</html>

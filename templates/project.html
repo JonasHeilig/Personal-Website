@@ -14,8 +14,11 @@
         {% if project.project_download %}
         <a href="/download/{{ project.id }}" class="btn btn-primary">Download</a>
         {% endif %}
-        {% if project.github_link %}
+        {% if project.github_link and project.github_link != 'https://' %}
         <a href="{{ project.github_link }}" class="btn btn-secondary" target="_blank">GitHub</a>
+        {% endif %}
+        {% if user_in_session and user_in_session.isauthor %}
+        <a href="/edit_project/{{ project.id }}" class="btn btn-info">Bearbeiten</a>
         {% endif %}
     </div>
 </body>
