@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{{ post.post_title }}</title>
+    <link rel="stylesheet" href="/static/bootstrap-5.3.3-dist/css/bootstrap.min.css">
+    <script src="/static/bootstrap-5.3.3-dist/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ post.post_title }}</h1>
+        <p>{{ post.post_content }}</p>
+        <p><small class="text-muted">By {{ post.post_author }}</small></p>
+        {% for image in post.post_image %}
+        <img src="{{ image }}" alt="Post image">
+        {% endfor %}
+    </div>
+</body>
+</html>

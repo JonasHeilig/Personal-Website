@@ -32,10 +32,9 @@ class User(db.Model):
 
 class Posts(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    post_id = db.Column(db.Integer, nullable=False)
     post_title = db.Column(db.String(50), nullable=False)
     post_content = db.Column(db.String(500), nullable=False)
-    post_image = db.Column(db.String(100), nullable=False)
+    post_image = db.Column(db.String(100), nullable=True)
     post_author = db.Column(db.String(50), nullable=False)
 
 
@@ -147,12 +146,37 @@ def logout():
 
 @app.route('/blog')
 def blog():
-    pass
+    posts = Posts.query.all()
+    return render_template('blog.html', posts=posts)
 
 
-@app.route('/write_blog')
-def write_article():
-    pass
+@app.route('/write_blog', methods=['GET', 'POST'])
+def write_blog():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    username = session['username']
+    user_in_session = User.query.filter_by(username=username).first()
+    if not user_in_session.isauthor:
+        return redirect(url_for('blog'))
+    if request.method == 'POST':
+        new_post = Posts(
+            post_title=request.form['post_title'],
+            post_content=request.form['post_content'],
+            post_image=request.form['post_image'],
+            post_author=username
+        )
+        db.session.add(new_post)
+        db.session.commit()
+        return redirect(url_for('blog'))
+    return render_template('write_blog.html')
+
+
+@app.route('/blog_post/<int:post_id>')
+def blog_post(post_id):
+    post = Posts.query.get(post_id)
+    if post is None:
+        return "Post not found", 404
+    return render_template('blog_post.html', post=post)
 
 
 @app.route('/projects')

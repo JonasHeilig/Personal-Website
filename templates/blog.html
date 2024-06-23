@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Blog</title>
+    <link rel="stylesheet" href="/static/bootstrap-5.3.3-dist/css/bootstrap.min.css">
+    <script src="/static/bootstrap-5.3.3-dist/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Blog</h1>
+        {% for post in posts %}
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ post.post_title }}</h5>
+                <p class="card-text">{{ post.post_content }}</p>
+                <p class="card-text"><small class="text-muted">By {{ post.post_author }}</small></p>
+                <a href="{{ url_for('blog_post', post_id=post.id) }}" class="btn btn-primary">Read More</a>
+            </div>
+        </div>
+        <br>
+        {% endfor %}
+    </div>
+</body>
+</html>
