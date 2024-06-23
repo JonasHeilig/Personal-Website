@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Project Details</title>
+    <link rel="stylesheet" href="/static/bootstrap-5.3.3-dist/css/bootstrap.min.css">
+    <script src="/static/bootstrap-5.3.3-dist/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ project.project_name }}</h1>
+        <img src="{{ project.project_image }}" class="card-img-top" alt="{{ project.project_name }}">
+        <p>{{ project.project_description }}</p>
+        <a href="/download/{{ project.project_id }}" class="btn btn-primary">Download</a>
+    </div>
+</body>
+</html>

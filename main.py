@@ -14,6 +14,10 @@ db = SQLAlchemy(app)
 class ProjectList(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     project_id = db.Column(db.Integer, nullable=False)
+    project_name = db.Column(db.String(50), nullable=False)
+    project_description = db.Column(db.String(500), nullable=False)
+    project_image = db.Column(db.String(100), nullable=False)
+    project_download = db.Column(db.String(100), nullable=False)
 
 
 class User(db.Model):
@@ -26,6 +30,11 @@ class User(db.Model):
 
 class Posts(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    post_id = db.Column(db.Integer, nullable=False)
+    post_title = db.Column(db.String(50), nullable=False)
+    post_content = db.Column(db.String(500), nullable=False)
+    post_image = db.Column(db.String(100), nullable=False)
+    post_author = db.Column(db.String(50), nullable=False)
 
 
 if not os.path.exists('instance/db.db'):
@@ -51,12 +60,16 @@ def blog():
 
 @app.route('/projects')
 def projects():
-    pass
+    project_list = ProjectList.query.all()
+    return render_template('projects.html', projects=project_list)
 
 
 @app.route('/project/<int:project_id>')
 def project(project_id):
-    pass
+    project_element = ProjectList.query.filter_by(project_id=project_id).first()
+    if project_element is None:
+        return render_template('project_not_found.html')
+    return render_template('project.html', project=project_element)
 
 
 @app.route('/download/<int:project_id>')
