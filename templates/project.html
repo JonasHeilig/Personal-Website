@@ -11,7 +11,9 @@
         <h1>{{ project.project_name }}</h1>
         <img src="{{ project.project_image }}" class="card-img-top" alt="{{ project.project_name }}">
         <p>{{ project.project_description }}</p>
-        <a href="/download/{{ project.project_id }}" class="btn btn-primary">Download</a>
+        {% if project.project_download %}
+        <a href="/download/{{ project.id }}" class="btn btn-primary">Download</a>
+        {% endif %}
     </div>
 </body>
 </html>

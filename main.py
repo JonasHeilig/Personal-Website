@@ -12,12 +12,11 @@ db = SQLAlchemy(app)
 
 
 class ProjectList(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    project_id = db.Column(db.Integer, nullable=False)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     project_name = db.Column(db.String(50), nullable=False)
     project_description = db.Column(db.String(500), nullable=False)
-    project_image = db.Column(db.String(100), nullable=False)
-    project_download = db.Column(db.String(100), nullable=False)
+    project_image = db.Column(db.String(100), nullable=True)
+    project_download = db.Column(db.String(100), nullable=True)
 
 
 class User(db.Model):
@@ -64,9 +63,9 @@ def projects():
     return render_template('projects.html', projects=project_list)
 
 
-@app.route('/project/<int:project_id>')
-def project(project_id):
-    project_element = ProjectList.query.filter_by(project_id=project_id).first()
+@app.route('/project/<int:id>')
+def project(id):
+    project_element = ProjectList.query.get(id)
     if project_element is None:
         return render_template('project_not_found.html')
     return render_template('project.html', project=project_element)
@@ -87,9 +86,19 @@ def write_article():
     pass
 
 
-@app.route('/add_project')
+@app.route('/add_project', methods=['GET', 'POST'])
 def add_project():
-    pass
+    if request.method == 'POST':
+        new_project = ProjectList(
+            project_name=request.form['project_name'],
+            project_description=request.form['project_description'],
+            project_image=request.form['project_image'],
+            project_download=request.form['project_download']
+        )
+        db.session.add(new_project)
+        db.session.commit()
+        return redirect(url_for('projects'))
+    return render_template('add_project.html')
 
 
 @app.route('/login', methods=['GET', 'POST'])

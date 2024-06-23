@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Projekt hinzufügen</title>
+    <link rel="stylesheet" href="/static/bootstrap-5.3.3-dist/css/bootstrap.min.css">
+    <script src="/static/bootstrap-5.3.3-dist/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Neues Projekt hinzufügen</h1>
+        <form action="/add_project" method="post">
+            <div class="mb-3">
+                <label for="projectName" class="form-label">Projektname</label>
+                <input type="text" class="form-control" id="projectName" name="project_name" required>
+            </div>
+            <div class="mb-3">
+                <label for="projectDescription" class="form-label">Projektbeschreibung</label>
+                <textarea class="form-control" id="projectDescription" name="project_description" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="projectImage" class="form-label">Projektbild URL</label>
+                <input type="text" class="form-control" id="projectImage" name="project_image" required>
+            </div>
+            <div class="mb-3">
+                <label for="projectDownload" class="form-label">Projektdownload URL</label>
+                <input type="text" class="form-control" id="projectDownload" name="project_download">
+            </div>
+            <button type="submit" class="btn btn-primary">Projekt hinzufügen</button>
+        </form>
+    </div>
+</body>
+</html>
