@@ -147,7 +147,7 @@ def logout():
 @app.route('/blog')
 def blog():
     posts = Posts.query.all()
-    return render_template('blog.html', posts=posts)
+    return render_template('blog_system/blog.html', posts=posts)
 
 
 @app.route('/write_blog', methods=['GET', 'POST'])
@@ -168,7 +168,7 @@ def write_blog():
         db.session.add(new_post)
         db.session.commit()
         return redirect(url_for('blog'))
-    return render_template('write_blog.html')
+    return render_template('blog_system/write_blog.html')
 
 
 @app.route('/blog_post/<int:post_id>')
@@ -176,7 +176,7 @@ def blog_post(post_id):
     post = Posts.query.get(post_id)
     if post is None:
         return "Post not found", 404
-    return render_template('blog_post.html', post=post)
+    return render_template('blog_system/blog_post.html', post=post)
 
 
 @app.route('/projects')
