@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from flask import Flask, render_template, request, redirect, session, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask import send_from_directory
@@ -36,6 +37,7 @@ class Posts(db.Model):
     post_content = db.Column(db.String(500), nullable=False)
     post_image = db.Column(db.String(100), nullable=True)
     post_author = db.Column(db.String(50), nullable=False)
+    post_date = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 def create_default_user():
@@ -58,7 +60,54 @@ def index():
 
 @app.route('/admin')
 def admin():
-    pass
+    if 'username' not in session or not User.query.filter_by(username=session['username']).first().isadmin:
+        return redirect(url_for('index'))
+    users = User.query.all()
+    return render_template('administration/admin.html', users=users)
+
+
+@app.route('/add_user', methods=['GET', 'POST'])
+def add_user():
+    if 'username' not in session or not User.query.filter_by(username=session['username']).first().isadmin:
+        return redirect(url_for('index'))
+    if request.method == 'POST':
+        new_user = User(
+            username=request.form['username'],
+            password=generate_password_hash(request.form['password']),
+            isadmin=request.form.get('isadmin') == 'on',
+            isauthor=request.form.get('isauthor') == 'on'
+        )
+        db.session.add(new_user)
+        db.session.commit()
+        return redirect(url_for('admin'))
+    return render_template('administration/add_user.html')
+
+
+@app.route('/remove_user', methods=['GET', 'POST'])
+def remove_user():
+    if 'username' not in session or not User.query.filter_by(username=session['username']).first().isadmin:
+        return redirect(url_for('index'))
+    if request.method == 'POST':
+        user_to_remove = User.query.filter_by(username=request.form['username']).first()
+        if user_to_remove:
+            db.session.delete(user_to_remove)
+            db.session.commit()
+        return redirect(url_for('admin'))
+    return render_template('administration/remove_user.html')
+
+
+@app.route('/change_permissions', methods=['GET', 'POST'])
+def change_permissions():
+    if 'username' not in session or not User.query.filter_by(username=session['username']).first().isadmin:
+        return redirect(url_for('index'))
+    if request.method == 'POST':
+        user_to_change = User.query.filter_by(username=request.form['username']).first()
+        if user_to_change:
+            user_to_change.isadmin = request.form.get('isadmin') == 'on'
+            user_to_change.isauthor = request.form.get('isauthor') == 'on'
+            db.session.commit()
+        return redirect(url_for('admin'))
+    return render_template('administration/change_permissions.html')
 
 
 @app.route('/download/<int:project_id>')

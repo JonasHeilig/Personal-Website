@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="/static/bootstrap-5.3.3-dist/css/bootstrap.min.css">
+    <script src="/static/bootstrap-5.3.3-dist/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Admin Panel</h1>
+        <a href="{{ url_for('add_user') }}" class="btn btn-primary">Add User</a>
+        <a href="{{ url_for('remove_user') }}" class="btn btn-primary">Remove User</a>
+        <a href="{{ url_for('change_permissions') }}" class="btn btn-primary">Change User Permissions</a>
+        <br><br>
+        <h2>User List</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Username</th>
+                    <th scope="col">Admin</th>
+                    <th scope="col">Author</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.username }}</td>
+                    <td>{{ 'Yes' if user.isadmin else 'No' }}</td>
+                    <td>{{ 'Yes' if user.isauthor else 'No' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
