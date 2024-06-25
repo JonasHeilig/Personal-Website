@@ -46,6 +46,11 @@ def create_default_user():
     db.session.commit()
 
 
+class AboutMe(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.Text, nullable=False)
+
+
 if not os.path.exists('instance/db.db'):
     with app.app_context():
         db.create_all()
@@ -58,12 +63,27 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/admin')
+@app.route('/about')
+def about():
+    about_content = AboutMe.query.first()
+    return render_template('about.html', about_content=about_content)
+
+
+@app.route('/admin', methods=['GET', 'POST'])
 def admin():
     if 'username' not in session or not User.query.filter_by(username=session['username']).first().isadmin:
         return redirect(url_for('index'))
     users = User.query.all()
-    return render_template('administration/admin.html', users=users)
+    about_me = AboutMe.query.first()
+    if about_me is None:
+        about_me = AboutMe(content="")
+        db.session.add(about_me)
+        db.session.commit()
+    if request.method == 'POST':
+        about_me.content = request.form['about_me']
+        db.session.commit()
+        return redirect(url_for('admin'))
+    return render_template('administration/admin.html', users=users, about_me=about_me)
 
 
 @app.route('/add_user', methods=['GET', 'POST'])

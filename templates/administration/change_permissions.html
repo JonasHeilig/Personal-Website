@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Change User Permissions</title>
+    <link rel="stylesheet" href="/static/bootstrap-5.3.3-dist/css/bootstrap.min.css">
+    <script src="/static/bootstrap-5.3.3-dist/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Change User Permissions</h1>
+        <form action="{{ url_for('change_permissions') }}" method="post">
+            <div class="form-group">
+                <input type="text" name="username" placeholder="Username" required class="form-control">
+            </div>
+            <div class="form-check">
+                <input type="checkbox" name="isadmin" class="form-check-input">
+                <label class="form-check-label">Admin</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" name="isauthor" class="form-check-input">
+                <label class="form-check-label">Author</label>
+            </div>
+            <input type="submit" value="Change Permissions" class="btn btn-primary">
+        </form>
+    </div>
+</body>
+</html>

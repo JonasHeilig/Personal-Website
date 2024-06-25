@@ -12,6 +12,14 @@
         <a href="{{ url_for('remove_user') }}" class="btn btn-primary">Remove User</a>
         <a href="{{ url_for('change_permissions') }}" class="btn btn-primary">Change User Permissions</a>
         <br><br>
+        <h2>About Me</h2>
+        <form action="{{ url_for('admin') }}" method="post">
+            <div class="form-group">
+                <textarea name="about_me" class="form-control" rows="10">{{ about_me.content }}</textarea>
+            </div>
+            <input type="submit" value="Save Changes" class="btn btn-primary">
+        </form>
+        <br><br>
         <h2>User List</h2>
         <table class="table">
             <thead>

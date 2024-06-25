@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Remove User</title>
+    <link rel="stylesheet" href="/static/bootstrap-5.3.3-dist/css/bootstrap.min.css">
+    <script src="/static/bootstrap-5.3.3-dist/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Remove User</h1>
+        <form action="{{ url_for('remove_user') }}" method="post">
+            <div class="form-group">
+                <input type="text" name="username" placeholder="Username" required class="form-control">
+            </div>
+            <input type="submit" value="Remove User" class="btn btn-primary">
+        </form>
+    </div>
+</body>
+</html>
