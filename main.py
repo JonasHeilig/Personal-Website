@@ -55,7 +55,7 @@ class AccessLog(db.Model):
 
 
 def create_default_user():
-    admin_user = User(username='admin', password=generate_password_hash('password'), isadmin=True, isauthor=True)
+    admin_user = User(username='admin', password=generate_password_hash('pw_jh_FE_NW'), isadmin=True, isauthor=True)
     db.session.add(admin_user)
     db.session.commit()
 

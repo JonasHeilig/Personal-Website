@@ -6,19 +6,47 @@
     <script src="/static/bootstrap-5.3.3-dist/js/bootstrap.min.js"></script>
 </head>
 <body>
-    <div class="container">
-        <h1>Blog</h1>
-        {% for post in posts %}
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">{{ post.post_title }}</h5>
-                <p class="card-text">{{ post.post_content }}</p>
-                <p class="card-text"><small class="text-muted">By {{ post.post_author }}</small></p>
-                <p class="card-text"><small class="text-muted">{{ post.post_date.strftime('%d.%m.%Y -%H.%M') }}</small></p>
-                <a href="{{ url_for('blog_post', post_id=post.id) }}" class="btn btn-primary">Read More</a>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/blog">Blog</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/projects">Projekte</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/blog">Blog</a>
+                    </li>
+                </ul>
             </div>
         </div>
-        <br>
+    </nav>
+
+    <div class="container mt-5">
+        <h1 class="mb-4">Blog</h1>
+        {% for post in posts %}
+        <div class="card mb-4">
+            <div class="row g-0">
+                <div class="col-md-4">
+                    <img src="{{ post.image_url }}" class="img-fluid rounded-start" alt="{{ post.post_title }}">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ post.post_title }}</h5>
+                        <p class="card-text">{{ post.post_content }}</p>
+                        <p class="card-text"><small class="text-muted">By {{ post.post_author }}</small></p>
+                        <p class="card-text"><small class="text-muted">{{ post.post_date.strftime('%d.%m.%Y - %H.%M') }}</small></p>
+                        <a href="{{ url_for('blog_post', post_id=post.id) }}" class="btn btn-primary">Read More</a>
+                    </div>
+                </div>
+            </div>
+        </div>
         {% endfor %}
     </div>
 </body>
